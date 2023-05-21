@@ -90,10 +90,10 @@ jobs:
           ls -la
           
           tox -e bindep || true
-          sudo apt-get install apt-transport-https debootstrap dosfstools gdisk gnupg2 inetutils-ping kpartx qemu-utils rpm squashfs-tools uuid-runtime -y
+          sudo apt-get install apt-transport-https debootstrap dosfstools gdisk gnupg2 inetutils-ping kpartx qemu-utils rpm squashfs-tools uuid-runtime binutils zstd -y
           tox -e bindep
           sudo tox -e venv -- disk-image-create rocky-container vm
-          
+
           ls -la
 
 
