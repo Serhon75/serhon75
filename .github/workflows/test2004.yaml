@@ -83,7 +83,7 @@ jobs:
           git clone https://opendev.org/openstack/diskimage-builder
           cd diskimage-builder
           #pip install pbr
-          #python setup.py sdist
+          python3 setup.py sdist
           #sudo chown -R $(whoami) .
           pwd
           #cat setup.cfg
