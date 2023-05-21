@@ -1,0 +1,135 @@
+name: Pipeline Openstack Imagedisk Builder Test
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      #images_list:
+      #  # TODO: Switch to multiple choice when the feature is implemented:
+      #  # https://github.com/actions/runner/issues/2076
+      #  description: JSON Array of images to build, eg. ["ubuntu-18.04", "ubuntu-22.04"]
+      #  required: true
+      #  type: string
+      #  default: '[ "ubuntu-22.04" ]'
+      
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  imagedisk-builder:
+    #runs-on: sip-vmware-runner
+    #runs-on: pure-iss
+    runs-on: ubuntu-2004
+    #outputs:
+      #image_name: ${{ matrix.image }}
+      #downstream: ${{ steps.extract-data.outputs.ami_id }}
+    #strategy:
+    #  fail-fast: false
+    #  matrix:
+    #    image: ${{ fromJson(inputs.images_list) }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Runner info
+        run: |
+          set -x
+          cat /etc/os-release
+          lsb_release -a
+          df -h
+          free -h
+          pwd
+          egrep -c '(vmx|svm)' /proc/cpuinfo || true
+          ip address
+          python --version || true
+          python2 --version || true
+          python3 --version || true
+          #ls -ld /tmp
+          #sudo chmod 1777 /tmp
+          #ls -ld /tmp
+          #sudo rm -rf /tmp/*
+          
+
+      #- name: Qemu kvm installing
+      #  run: |
+      #    set -x
+      #    apt update -y
+      #    #apt install -y qemu qemu-kvm libvirt-daemon libvirt-clients bridge-utils virt-manager
+      #    apt install -y qemu-system-x86 qemu-system libvirt-clients libvirt-daemon-system uml-utilities screen bridge-utils virtinst libvirt-daemon openssh-server
+
+
+      #- name: Setup Python
+      #  uses: actions/setup-python@v4
+      #  with:
+      #    python-version: "3.11"
+
+      #- name: Install pbr
+      #  run: pip install pbr
+
+      - name: diskimage-builder
+        run: |
+          set -x
+        
+          ls -la /tmp
+          #chmod 1777 /tmp
+          #ls -la /tmp
+          . /etc/os-release
+          echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+          curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key | sudo apt-key add -
+          sudo apt-get update
+          sudo apt-get install tox podman -y
+          git clone https://opendev.org/openstack/diskimage-builder
+          cd diskimage-builder
+          #pip install pbr
+          #python setup.py sdist
+          #sudo chown -R $(whoami) .
+          pwd
+          #cat setup.cfg
+          ls -la
+          
+          tox -e bindep || true
+          sudo apt-get install apt-transport-https debootstrap dosfstools gdisk gnupg2 inetutils-ping kpartx qemu-utils rpm squashfs-tools uuid-runtime -y
+          tox -e bindep
+          sudo tox -e venv -- disk-image-create rocky-container vm
+          
+          ls -la
+
+
+
+      #- name: Install Ansible and Python requirements
+      #  run: |
+      #    python -m pip install --upgrade pip
+      #    pip install -r ./pipeline/requirements.txt
+      #    ansible-galaxy install -r ./ansible/requirements.yaml
+
+      #- name: Download certificates in working directory
+      #  run: python ./pipeline/scripts/fetch_pure_certs.py --dir ${{ github.workspace }}
+
+      
+
+      - name: Check free space on runner
+        if: failure()
+        run: |
+          df -h
+          python --version || true
+          python2 --version || true
+          python3 --version || true  
+          pip list | grep setuptools || true
+          pip list | grep pbr || true
+          cat output.log
+
+      #- name: Display serial.log
+      #  run: |
+      #    cat serial.log
+      #    ls -la
+      #    ls -la /var/log
+      #  if: always()    
+
+    
+      #- name: Upload build result as artifact
+      #  uses: actions/upload-artifact@v3
+      #  with:
+      #    name: build-manifest
+      #    path: ${{ github.workspace }}/packer_manifest.json
