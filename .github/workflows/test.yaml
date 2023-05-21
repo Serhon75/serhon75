@@ -1,9 +1,9 @@
 name: Golden Image Pipeline Openstack
 
 on:
-  push:
-    branches:
-      - master
+#  push:
+#    branches:
+#      - master
   workflow_dispatch:
     inputs:
       #images_list:
