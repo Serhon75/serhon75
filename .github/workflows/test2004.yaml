@@ -72,7 +72,7 @@ jobs:
         run: |
           set -x
         
-          ls -la /tmp
+          #ls -la /tmp
           #chmod 1777 /tmp
           #ls -la /tmp
           . /etc/os-release
