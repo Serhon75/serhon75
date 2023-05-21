@@ -83,7 +83,7 @@ jobs:
           #git clone https://opendev.org/openstack/diskimage-builder
           cd diskimage-builder
           tox -e bindep
-          apt-get install apt-transport-https debootstrap gnupg2 inetutils-ping kpartx qemu-utils rpm -y
+          sudo apt-get install apt-transport-https debootstrap gnupg2 inetutils-ping kpartx qemu-utils rpm -y
           tox -e bindep
           
           sudo tox -e venv -- disk-image-create rocky-container vm
