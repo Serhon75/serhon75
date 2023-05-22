@@ -118,7 +118,9 @@ jobs:
           python3 --version || true  
           pip list | grep setuptools || true
           pip list | grep pbr || true
-          cat output.log
+          pip3 list | grep setuptools || true
+          pip3 list | grep pbr || true
+          
 
       #- name: Display serial.log
       #  run: |
